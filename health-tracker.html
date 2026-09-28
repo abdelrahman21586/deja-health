@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ديجا - متابعة الحالة الصحية</title>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <style>
+        :root {
+            color-scheme: light;
+            --primary-color: #4a90e2;
+            --secondary-color: #50c878;
+            --danger-color: #e74c3c;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #e1e8ed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #357abd);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            padding: 12px 25px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        nav button:hover {
+            background: var(--background);
+        }
+
+        nav button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background: var(--background);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            max-width: 300px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-success {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45b369;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* Test List */
+        .test-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .test-item {
+            background: var(--background);
+            padding: 20px;
+            border-radius: 8px;
+            border-right: 4px solid var(--primary-color);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: start;
+        }
+
+        .test-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .test-meta {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .test-notes {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .test-actions button {
+            margin: 5px 0;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), #357abd);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+        }
+
+        /* Report Section */
+        .report-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Hidden sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .test-item {
+                grid-template-columns: 1fr;
+            }
+
+            nav button {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        /* OCR Processing */
+        .ocr-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--background);
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .ocr-progress {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .extracted-values {
+            margin-top: 20px;
+        }
+
+        .value-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .value-row input {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+
+        .add-value-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .extracted-text {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .values-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+
+        .values-table th,
+        .values-table td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .values-table th {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            header, nav, .btn, .test-actions, .ocr-container {
+                display: none;
+            }
+
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>💊 ديجا - متابعة الحالة الصحية</h1>
+            <p>نظام متكامل لتتبع التحاليل والتقارير الطبية</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <button class="active" onclick="showSection('dashboard')">🏠 الرئيسية</button>
+            <button onclick="showSection('add-test')">➕ إضافة تحليل</button>
+            <button onclick="showSection('view-tests')">📋 التحاليل</button>
+            <button onclick="showSection('reports')">📊 التقارير</button>
+            <button onclick="showSection('settings')">⚙️ الإعدادات</button>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="total-tests">0</h3>
+                    <p>إجمالي التحاليل</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, var(--secondary-color), #45b369);">
+                    <h3 id="recent-tests">0</h3>
+                    <p>تحاليل آخر 3 شهور</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                    <h3 id="test-types">0</h3>
+                    <p>أنواع التحاليل</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>آخر التحاليل</h2>
+                <div id="recent-tests-list"></div>
+            </div>
+        </div>
+
+        <!-- Add Test Section -->
+        <div id="add-test" class="section">
+            <div class="card">
+                <h2>إضافة تحليل جديد</h2>
+                <form id="test-form">
+                    <div class="form-group">
+                        <label>نوع التحليل *</label>
+                        <select id="test-type" required>
+                            <option value="">اختر نوع التحليل</option>
+                            <option value="تحليل دم كامل">تحليل دم كامل (CBC)</option>
+                            <option value="وظائف الكبد">وظائف الكبد</option>
+                            <option value="وظائف الكلى">وظائف الكلى</option>
+                            <option value="فيتامينات">فيتامينات</option>
+                            <option value="هرمونات">هرمونات</option>
+                            <option value="سكر">سكر</option>
+                            <option value="تحليل بول">تحليل بول</option>
+                            <option value="أشعة">أشعة</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تاريخ التحليل *</label>
+                        <input type="date" id="test-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>اسم التحليل / التفاصيل</label>
+                        <input type="text" id="test-name" placeholder="مثال: فيتامين د، صورة دم، إلخ">
+                    </div>
+
+                    <div class="form-group">
+                        <label>النتائج / الملاحظات</label>
+                        <textarea id="test-notes" placeholder="اكتب النتائج أو أي ملاحظات هنا..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>رفع صورة التحليل</label>
+                        <div class="file-upload" onclick="document.getElementById('test-file').click()">
+                            <input type="file" id="test-file" accept="image/*,application/pdf" onchange="handleFileUpload(event)">
+                            <p>📁 اضغط هنا لرفع صورة التحليل</p>
+                            <small>يمكنك رفع صور أو ملفات PDF</small>
+                        </div>
+                        <div id="file-preview" class="file-preview"></div>
+
+                        <!-- OCR Section -->
+                        <div id="ocr-section" style="display: none;">
+                            <button type="button" class="btn btn-success" onclick="extractTextFromImage()" style="margin-top: 15px;">
+                                🔍 قراءة النص من الصورة
+                            </button>
+
+                            <div id="ocr-progress" class="ocr-progress" style="display: none;">
+                                <p id="ocr-status">جاري قراءة التحليل...</p>
+                                <div class="progress-bar">
+                                    <div id="progress-fill" class="progress-bar-fill">0%</div>
+                                </div>
+                            </div>
+
+                            <div id="ocr-result" class="ocr-container" style="display: none;">
+                                <h3 style="color: var(--primary-color); margin-bottom: 15px;">النص المستخرج:</h3>
+                                <div id="extracted-text" class="extracted-text"></div>
+
+                                <h3 style="color: var(--primary-color); margin: 20px 0 15px;">القيم المستخرجة:</h3>
+                                <div id="extracted-values" class="extracted-values">
+                                    <!-- Values will be added here -->
+                                </div>
+                                <button type="button" class="add-value-btn" onclick="addValueRow()">
+                                    ➕ إضافة قيمة يدوياً
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">💾 حفظ التحليل</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- View Tests Section -->
+        <div id="view-tests" class="section">
+            <div class="card">
+                <h2>جميع التحاليل</h2>
+                <div class="form-group">
+                    <label>البحث والتصفية</label>
+                    <input type="text" id="search-tests" placeholder="ابحث عن تحليل..." onkeyup="filterTests()">
+                </div>
+                <div class="form-group">
+                    <select id="filter-type" onchange="filterTests()">
+                        <option value="">كل الأنواع</option>
+                        <option value="تحليل دم كامل">تحليل دم كامل (CBC)</option>
+                        <option value="وظائف الكبد">وظائف الكبد</option>
+                        <option value="وظائف الكلى">وظائف الكلى</option>
+                        <option value="فيتامينات">فيتامينات</option>
+                        <option value="هرمونات">هرمونات</option>
+                        <option value="سكر">سكر</option>
+                        <option value="تحليل بول">تحليل بول</option>
+                        <option value="أشعة">أشعة</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                <div id="tests-list" class="test-list"></div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports" class="section">
+            <div class="card">
+                <h2>التقارير الطبية</h2>
+
+                <div class="report-options">
+                    <div class="form-group">
+                        <label>من تاريخ</label>
+                        <input type="date" id="report-from">
+                    </div>
+                    <div class="form-group">
+                        <label>إلى تاريخ</label>
+                        <input type="date" id="report-to">
+                    </div>
+                    <div class="form-group">
+                        <label>نوع التحليل</label>
+                        <select id="report-type">
+                            <option value="">كل الأنواع</option>
+                            <option value="تحليل دم كامل">تحليل دم كامل (CBC)</option>
+                            <option value="وظائف الكبد">وظائف الكبد</option>
+                            <option value="وظائف الكلى">وظائف الكلى</option>
+                            <option value="فيتامينات">فيتامينات</option>
+                            <option value="هرمونات">هرمونات</option>
+                            <option value="سكر">سكر</option>
+                            <option value="تحليل بول">تحليل بول</option>
+                            <option value="أشعة">أشعة</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" onclick="generateReport()">📄 إنشاء تقرير</button>
+                <button class="btn btn-primary" onclick="printReport()">🖨️ طباعة التقرير</button>
+
+                <div id="report-content" style="margin-top: 30px;"></div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings" class="section">
+            <div class="card">
+                <h2>الإعدادات</h2>
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label>اسم الابنة</label>
+                        <input type="text" id="patient-name" placeholder="أدخل اسم ابنتك">
+                    </div>
+
+                    <div class="form-group">
+                        <label>تاريخ الميلاد</label>
+                        <input type="date" id="patient-dob">
+                    </div>
+
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="patient-phone" placeholder="+20 1XX XXX XXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ملاحظات إضافية</label>
+                        <textarea id="patient-notes" placeholder="أي ملاحظات طبية مهمة..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">💾 حفظ الإعدادات</button>
+                </form>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                    <h3 style="color: var(--danger-color); margin-bottom: 15px;">منطقة الخطر</h3>
+                    <button class="btn btn-danger" onclick="exportData()">📥 تصدير جميع البيانات</button>
+                    <button class="btn btn-danger" onclick="deleteAllData()" style="margin-right: 10px;">🗑️ حذف جميع البيانات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        let tests = JSON.parse(localStorage.getItem('healthTests')) || [];
+        let settings = JSON.parse(localStorage.getItem('healthSettings')) || {};
+        let currentExtractedValues = [];
+        let currentImageData = null;
+
+        // Set today's date as default
+        document.getElementById('test-date').valueAsDate = new Date();
+        document.getElementById('report-to').valueAsDate = new Date();
+
+        // Set 3 months ago as default start date for reports
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        document.getElementById('report-from').valueAsDate = threeMonthsAgo;
+
+        // Load settings on page load
+        loadSettings();
+        updateDashboard();
+        displayRecentTests();
+
+        // Show/Hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (sectionId === 'view-tests') {
+                displayTests();
+            } else if (sectionId === 'dashboard') {
+                updateDashboard();
+                displayRecentTests();
+            }
+        }
+
+        // Handle file upload with OCR support
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('file-preview');
+            const ocrSection = document.getElementById('ocr-section');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageData = e.target.result;
+
+                    if (file.type.startsWith('image/')) {
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        ocrSection.style.display = 'block';
+                    } else {
+                        preview.innerHTML = `<p>✅ تم رفع الملف: ${file.name}</p>`;
+                        ocrSection.style.display = 'none';
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Extract text from image using OCR
+        async function extractTextFromImage() {
+            if (!currentImageData) {
+                alert('⚠️ يرجى رفع صورة أولاً');
+                return;
+            }
+
+            const progressDiv = document.getElementById('ocr-progress');
+            const resultDiv = document.getElementById('ocr-result');
+            const statusText = document.getElementById('ocr-status');
+            const progressFill = document.getElementById('progress-fill');
+
+            progressDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            statusText.textContent = 'جاري تحميل محرك التعرف على النصوص...';
+            progressFill.style.width = '10%';
+            progressFill.textContent = '10%';
+
+            try {
+                const worker = await Tesseract.createWorker('ara+eng', 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const progress = Math.round(m.progress * 100);
+                            progressFill.style.width = progress + '%';
+                            progressFill.textContent = progress + '%';
+                            statusText.textContent = `جاري قراءة التحليل... ${progress}%`;
+                        }
+                    }
+                });
+
+                statusText.textContent = 'جاري قراءة النص من الصورة...';
+
+                const { data: { text } } = await worker.recognize(currentImageData);
+                await worker.terminate();
+
+                // Display extracted text
+                document.getElementById('extracted-text').textContent = text;
+
+                // Parse values from text
+                parseLabValues(text);
+
+                progressDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+
+            } catch (error) {
+                console.error('OCR Error:', error);
+                alert('❌ حدث خطأ في قراءة الصورة. حاول مرة أخرى.');
+                progressDiv.style.display = 'none';
+            }
+        }
+
+        // Parse lab values from extracted text
+        function parseLabValues(text) {
+            currentExtractedValues = [];
+            const lines = text.split('\n');
+
+            // Common patterns for lab results
+            const patterns = [
+                // Pattern: Name: Value Unit or Name Value Unit
+                /([A-Za-z؀-ۿ\s]+)[\s:]+([0-9.]+)\s*([A-Za-z؀-ۿ%/]*)/g,
+                // Pattern with parentheses: Name (unit): value
+                /([A-Za-z؀-ۿ\s]+)\s*\(([^)]+)\)[\s:]+([0-9.]+)/g
+            ];
+
+            patterns.forEach(pattern => {
+                let match;
+                while ((match = pattern.exec(text)) !== null) {
+                    const name = match[1].trim();
+                    const value = pattern === patterns[0] ? match[2] : match[3];
+                    const unit = pattern === patterns[0] ? match[3] : match[2];
+
+                    // Filter out very short or irrelevant matches
+                    if (name.length > 2 && value) {
+                        currentExtractedValues.push({
+                            name: name,
+                            value: value,
+                            unit: unit || ''
+                        });
+                    }
+                }
+            });
+
+            displayExtractedValues();
+        }
+
+        // Display extracted values in editable form
+        function displayExtractedValues() {
+            const container = document.getElementById('extracted-values');
+
+            if (currentExtractedValues.length === 0) {
+                container.innerHTML = `
+                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">
+                        لم يتم العثور على قيم تلقائياً. يمكنك إضافة القيم يدوياً باستخدام الزر بالأسفل
+                    </p>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentExtractedValues.map((val, index) => `
+                <div class="value-row">
+                    <input type="text" placeholder="اسم التحليل" value="${val.name}"
+                           onchange="updateValue(${index}, 'name', this.value)">
+                    <input type="text" placeholder="القيمة" value="${val.value}"
+                           onchange="updateValue(${index}, 'value', this.value)">
+                    <input type="text" placeholder="الوحدة" value="${val.unit}"
+                           onchange="updateValue(${index}, 'unit', this.value)" style="max-width: 100px;">
+                    <button type="button" onclick="removeValue(${index})"
+                            style="background: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer;">
+                        🗑️
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Update extracted value
+        function updateValue(index, field, value) {
+            if (currentExtractedValues[index]) {
+                currentExtractedValues[index][field] = value;
+            }
+        }
+
+        // Remove value
+        function removeValue(index) {
+            currentExtractedValues.splice(index, 1);
+            displayExtractedValues();
+        }
+
+        // Add new value row manually
+        function addValueRow() {
+            currentExtractedValues.push({
+                name: '',
+                value: '',
+                unit: ''
+            });
+            displayExtractedValues();
+        }
+
+        // File preview (old function - kept for compatibility)
+        function previewFile(event) {
+            handleFileUpload(event);
+        }
+
+        // Add test
+        document.getElementById('test-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('test-file');
+            const file = fileInput.files[0];
+
+            const test = {
+                id: Date.now(),
+                type: document.getElementById('test-type').value,
+                date: document.getElementById('test-date').value,
+                name: document.getElementById('test-name').value,
+                notes: document.getElementById('test-notes').value,
+                file: null,
+                fileName: file ? file.name : null,
+                extractedValues: currentExtractedValues.length > 0 ? [...currentExtractedValues] : null
+            };
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    test.file = e.target.result;
+                    saveTest(test);
+                }
+                reader.readAsDataURL(file);
+            } else {
+                saveTest(test);
+            }
+        });
+
+        function saveTest(test) {
+            tests.push(test);
+            localStorage.setItem('healthTests', JSON.stringify(tests));
+
+            alert('✅ تم حفظ التحليل بنجاح!');
+            document.getElementById('test-form').reset();
+            document.getElementById('file-preview').innerHTML = '';
+            document.getElementById('ocr-section').style.display = 'none';
+            document.getElementById('ocr-result').style.display = 'none';
+            document.getElementById('test-date').valueAsDate = new Date();
+            currentExtractedValues = [];
+            currentImageData = null;
+
+            updateDashboard();
+        }
+
+        // Display tests
+        function displayTests(filteredTests = null) {
+            const testsList = document.getElementById('tests-list');
+            const testsToDisplay = filteredTests || tests;
+
+            if (testsToDisplay.length === 0) {
+                testsList.innerHTML = `
+                    <div class="empty-state">
+                        <p style="font-size: 1.2em;">لا توجد تحاليل مسجلة بعد</p>
+                        <p>ابدأ بإضافة أول تحليل من قائمة "إضافة تحليل"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            testsList.innerHTML = testsToDisplay.sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map(test => `
+                    <div class="test-item">
+                        <div class="test-info">
+                            <h3>${test.type}${test.name ? ` - ${test.name}` : ''}</h3>
+                            <div class="test-meta">
+                                📅 ${new Date(test.date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </div>
+                            ${test.notes ? `<div class="test-notes">${test.notes}</div>` : ''}
+                            ${test.extractedValues && test.extractedValues.length > 0 ? `
+                                <div class="test-notes" style="margin-top: 10px;">
+                                    <strong>القيم المستخرجة:</strong>
+                                    <table class="values-table" style="margin-top: 10px; font-size: 13px;">
+                                        <thead>
+                                            <tr>
+                                                <th>الاسم</th>
+                                                <th>القيمة</th>
+                                                <th>الوحدة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${test.extractedValues.map(val => `
+                                                <tr>
+                                                    <td>${val.name}</td>
+                                                    <td>${val.value}</td>
+                                                    <td>${val.unit}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ` : ''}
+                            ${test.file ? `<div style="margin-top: 10px;">
+                                <button class="btn btn-primary" onclick="viewFile(${test.id})" style="font-size: 13px; padding: 6px 12px;">👁️ عرض الملف</button>
+                            </div>` : ''}
+                        </div>
+                        <div class="test-actions">
+                            <button class="btn btn-danger" onclick="deleteTest(${test.id})">🗑️ حذف</button>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // Display recent tests on dashboard
+        function displayRecentTests() {
+            const recentTestsList = document.getElementById('recent-tests-list');
+            const recentTests = tests.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+            if (recentTests.length === 0) {
+                recentTestsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>لا توجد تحاليل حديثة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            recentTestsList.innerHTML = recentTests.map(test => `
+                <div class="test-item">
+                    <div class="test-info">
+                        <h3>${test.type}${test.name ? ` - ${test.name}` : ''}</h3>
+                        <div class="test-meta">
+                            📅 ${new Date(test.date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter tests
+        function filterTests() {
+            const searchTerm = document.getElementById('search-tests').value.toLowerCase();
+            const filterType = document.getElementById('filter-type').value;
+
+            const filtered = tests.filter(test => {
+                const matchesSearch = !searchTerm ||
+                    test.type.toLowerCase().includes(searchTerm) ||
+                    (test.name && test.name.toLowerCase().includes(searchTerm)) ||
+                    (test.notes && test.notes.toLowerCase().includes(searchTerm));
+
+                const matchesType = !filterType || test.type === filterType;
+
+                return matchesSearch && matchesType;
+            });
+
+            displayTests(filtered);
+        }
+
+        // Delete test
+        function deleteTest(id) {
+            if (confirm('هل أنت متأكد من حذف هذا التحليل؟')) {
+                tests = tests.filter(test => test.id !== id);
+                localStorage.setItem('healthTests', JSON.stringify(tests));
+                displayTests();
+                updateDashboard();
+                alert('✅ تم حذف التحليل');
+            }
+        }
+
+        // View file
+        function viewFile(id) {
+            const test = tests.find(t => t.id === id);
+            if (test && test.file) {
+                const win = window.open();
+                win.document.write(`
+                    <html dir="rtl">
+                    <head><title>${test.type} - ${test.name || ''}</title></head>
+                    <body style="margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #333;">
+                        <img src="${test.file}" style="max-width: 100%; max-height: 100vh;">
+                    </body>
+                    </html>
+                `);
+            }
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('total-tests').textContent = tests.length;
+
+            const threeMonthsAgo = new Date();
+            threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+            const recentCount = tests.filter(test => new Date(test.date) >= threeMonthsAgo).length;
+            document.getElementById('recent-tests').textContent = recentCount;
+
+            const uniqueTypes = [...new Set(tests.map(test => test.type))].length;
+            document.getElementById('test-types').textContent = uniqueTypes;
+        }
+
+        // Generate report
+        function generateReport() {
+            const fromDate = document.getElementById('report-from').value;
+            const toDate = document.getElementById('report-to').value;
+            const reportType = document.getElementById('report-type').value;
+
+            let filteredTests = tests.filter(test => {
+                const testDate = new Date(test.date);
+                const matchesDate = (!fromDate || testDate >= new Date(fromDate)) &&
+                                  (!toDate || testDate <= new Date(toDate));
+                const matchesType = !reportType || test.type === reportType;
+                return matchesDate && matchesType;
+            });
+
+            filteredTests.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const reportContent = document.getElementById('report-content');
+
+            if (filteredTests.length === 0) {
+                reportContent.innerHTML = `
+                    <div class="empty-state">
+                        <p>لا توجد تحاليل في الفترة المحددة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const patientInfo = settings.name ? `
+                <div style="background: var(--background); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: var(--primary-color);">البيانات الشخصية</h3>
+                    <p><strong>الاسم:</strong> ${settings.name}</p>
+                    ${settings.dob ? `<p><strong>تاريخ الميلاد:</strong> ${new Date(settings.dob).toLocaleDateString('ar-EG')}</p>` : ''}
+                    ${settings.phone ? `<p><strong>رقم الهاتف:</strong> ${settings.phone}</p>` : ''}
+                </div>
+            ` : '';
+
+            reportContent.innerHTML = `
+                <div id="printable-report">
+                    <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 30px;">
+                        📊 التقرير الطبي الشامل
+                    </h2>
+
+                    ${patientInfo}
+
+                    <div style="background: var(--background); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <p><strong>الفترة:</strong> من ${fromDate ? new Date(fromDate).toLocaleDateString('ar-EG') : 'البداية'}
+                        إلى ${toDate ? new Date(toDate).toLocaleDateString('ar-EG') : 'اليوم'}</p>
+                        <p><strong>عدد التحاليل:</strong> ${filteredTests.length}</p>
+                        <p><strong>تاريخ التقرير:</strong> ${new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+
+                    <h3 style="margin: 30px 0 20px; color: var(--primary-color);">التحاليل المسجلة:</h3>
+
+                    ${filteredTests.map((test, index) => `
+                        <div style="background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; border-right: 4px solid var(--primary-color); page-break-inside: avoid;">
+                            <h4 style="color: var(--primary-color); margin-bottom: 10px;">
+                                ${index + 1}. ${test.type}${test.name ? ` - ${test.name}` : ''}
+                            </h4>
+                            <p style="color: var(--text-secondary); margin-bottom: 10px;">
+                                📅 ${new Date(test.date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </p>
+                            ${test.extractedValues && test.extractedValues.length > 0 ? `
+                                <div style="background: var(--background); padding: 15px; border-radius: 5px; margin-top: 10px;">
+                                    <strong>القيم المستخرجة من التحليل:</strong>
+                                    <table style="width: 100%; margin-top: 10px; border-collapse: collapse;">
+                                        <thead>
+                                            <tr style="background: white;">
+                                                <th style="padding: 8px; text-align: right; border-bottom: 2px solid var(--border-color);">التحليل</th>
+                                                <th style="padding: 8px; text-align: right; border-bottom: 2px solid var(--border-color);">القيمة</th>
+                                                <th style="padding: 8px; text-align: right; border-bottom: 2px solid var(--border-color);">الوحدة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${test.extractedValues.map(val => `
+                                                <tr>
+                                                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${val.name}</td>
+                                                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${val.value}</td>
+                                                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${val.unit}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ` : ''}
+                            ${test.notes ? `
+                                <div style="background: var(--background); padding: 15px; border-radius: 5px; margin-top: 10px;">
+                                    <strong>النتائج والملاحظات:</strong><br>
+                                    ${test.notes}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+
+                    <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+                        <p>تم إنشاء هذا التقرير بواسطة نظام ديجا لمتابعة الحالة الصحية</p>
+                        <p>${new Date().toLocaleString('ar-EG')}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Print report
+        function printReport() {
+            const reportContent = document.getElementById('report-content');
+            if (!reportContent.innerHTML) {
+                alert('⚠️ يرجى إنشاء التقرير أولاً');
+                return;
+            }
+            window.print();
+        }
+
+        // Settings
+        document.getElementById('settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            settings = {
+                name: document.getElementById('patient-name').value,
+                dob: document.getElementById('patient-dob').value,
+                phone: document.getElementById('patient-phone').value,
+                notes: document.getElementById('patient-notes').value
+            };
+
+            localStorage.setItem('healthSettings', JSON.stringify(settings));
+            alert('✅ تم حفظ الإعدادات بنجاح!');
+        });
+
+        function loadSettings() {
+            if (settings.name) document.getElementById('patient-name').value = settings.name;
+            if (settings.dob) document.getElementById('patient-dob').value = settings.dob;
+            if (settings.phone) document.getElementById('patient-phone').value = settings.phone;
+            if (settings.notes) document.getElementById('patient-notes').value = settings.notes;
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                tests: tests,
+                settings: settings,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `health-data-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+
+            alert('✅ تم تصدير البيانات بنجاح!');
+        }
+
+        // Delete all data
+        function deleteAllData() {
+            if (confirm('⚠️ هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                if (confirm('⚠️ تأكيد أخير: سيتم حذف كل شيء نهائياً!')) {
+                    localStorage.removeItem('healthTests');
+                    localStorage.removeItem('healthSettings');
+                    tests = [];
+                    settings = {};
+                    updateDashboard();
+                    displayTests();
+                    document.getElementById('settings-form').reset();
+                    alert('✅ تم حذف جميع البيانات');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
